@@ -1,2 +1,5 @@
 *.zip
 *.o
+/hashtable/test
+/btree/iter/test
+/btree/rec/test
