@@ -6,6 +6,7 @@ FILES=btree.c ../btree.c stack.c ../test_util.c ../test.c
 
 test: $(FILES)
 	$(CC) $(CFLAGS) -o $@ $(FILES)
+	./test
 
 clean:
 	rm -f test

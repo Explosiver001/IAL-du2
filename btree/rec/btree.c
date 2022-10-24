@@ -18,6 +18,12 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree) {
+	if(*tree){
+		return;
+	}
+	*tree = malloc(sizeof(bst_node_t));
+	(*tree)->left = NULL;
+	(*tree)->right = NULL;
 }
 
 /*
@@ -30,7 +36,24 @@ void bst_init(bst_node_t **tree) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 bool bst_search(bst_node_t *tree, char key, int *value) {
-  return false;
+	if(tree == NULL){
+		return false;
+	}
+	else{
+		if(tree->key == key){
+			*value = tree->value;
+			return true;
+		}
+		else{
+			if(key<tree->key){
+				return bst_search(tree->left, key, value);
+			}
+			else{
+				return bst_search(tree->right, key, value);
+			}
+		}
+
+	}
 }
 
 /*
@@ -45,6 +68,21 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
+	if(*tree == NULL){
+		bst_init(tree);
+		(*tree)->key = key;
+		(*tree)->value = value;
+		return;
+	}
+
+	if(key < (*tree)->key)
+		bst_insert(&(*tree)->left, key, value);
+	else{
+		if(key > (*tree)->key)
+			bst_insert(&(*tree)->right, key, value);
+		else
+			(*tree)->value = value;
+	}
 }
 
 /*
