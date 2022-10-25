@@ -125,6 +125,33 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
+	bst_node_t *node = *tree;
+	bool lastRight = true;
+	while(true){
+		target->key = node->key;
+		target->value = node->value;
+		if(node->right){
+			target = node;
+			node = node->right;
+			lastRight = true;
+		}
+		else if(node->left){
+			target = node;
+			node = node->left;
+			lastRight = false;
+		}
+		else{
+			if(lastRight){
+				free(target->right);
+				target->right = NULL;
+			}
+			else{
+				free(target->left);
+				target->left = NULL;
+			}
+			break;
+		}
+	}
 }
 
 /*
@@ -140,6 +167,34 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
+	if(!(*tree))
+		return;
+
+	bst_node_t **node = tree;
+
+	while(*node && (*node)->key != key)
+	{
+		
+		if(key < (*node)->key){
+			node = &(*node)->left;
+		}
+		if(key > (*node)->key){
+			node = &(*node)->right;
+		}
+	}
+	
+	if(*node){
+		if((*node)->left || (*node)->right){
+			if((*node)->right)
+				bst_replace_by_rightmost(*node, &((*node)->right));
+			else
+				bst_replace_by_rightmost(*node, &((*node)->left));
+		}
+		else{
+			free(*node);
+			*node = NULL;
+		}
+	}
 }
 
 /*
@@ -153,6 +208,25 @@ void bst_delete(bst_node_t **tree, char key) {
  * vlastných pomocných funkcií.
  */
 void bst_dispose(bst_node_t **tree) {
+	stack_bst_t to_free;
+	stack_bst_init(&to_free);
+
+	do{
+		if(!(*tree)){
+			if(!stack_bst_empty(&to_free)){
+				(*tree) = stack_bst_pop(&to_free);
+			}
+		}
+		else{
+			if((*tree)->right){
+				stack_bst_push(&to_free, (*tree)->right);
+			}
+
+			bst_node_t *node = (*tree);
+			(*tree) = (*tree)->left;
+			free(node);
+		}
+	}while(*tree);
 }
 
 /*
@@ -165,11 +239,10 @@ void bst_dispose(bst_node_t **tree) {
  * vlastných pomocných funkcií.
  */
 void bst_leftmost_preorder(bst_node_t *tree, stack_bst_t *to_visit) {
-	stack_bst_init(to_visit);
-	
-	
 	while(tree){
-
+		stack_bst_push(to_visit, tree);
+		bst_print_node(tree);
+		tree = tree->left;
 	}
 }
 
@@ -182,6 +255,17 @@ void bst_leftmost_preorder(bst_node_t *tree, stack_bst_t *to_visit) {
  * zásobníku uzlov bez použitia vlastných pomocných funkcií.
  */
 void bst_preorder(bst_node_t *tree) {
+	stack_bst_t to_visit;
+	stack_bst_init(&to_visit);
+	
+	bst_leftmost_preorder(tree, &to_visit);
+	
+	while(!stack_bst_empty(&to_visit)){
+		tree = stack_bst_top(&to_visit);
+		stack_bst_pop(&to_visit);
+		bst_leftmost_preorder(tree->right, &to_visit);
+	}
+
 }
 
 /*
@@ -194,6 +278,10 @@ void bst_preorder(bst_node_t *tree) {
  * vlastných pomocných funkcií.
  */
 void bst_leftmost_inorder(bst_node_t *tree, stack_bst_t *to_visit) {
+	while(tree){
+		stack_bst_push(to_visit, tree);
+		tree = tree->left;
+	}
 }
 
 /*
@@ -205,6 +293,16 @@ void bst_leftmost_inorder(bst_node_t *tree, stack_bst_t *to_visit) {
  * zásobníku uzlov bez použitia vlastných pomocných funkcií.
  */
 void bst_inorder(bst_node_t *tree) {
+	stack_bst_t to_visit;
+	stack_bst_init(&to_visit);
+	
+	bst_leftmost_inorder(tree, &to_visit);
+	while(!stack_bst_empty(&to_visit)){
+		tree = stack_bst_top(&to_visit);
+		stack_bst_pop(&to_visit);
+		bst_print_node(tree);
+		bst_leftmost_inorder(tree->right, &to_visit);
+	}
 }
 
 /*
@@ -218,6 +316,11 @@ void bst_inorder(bst_node_t *tree) {
  * vlastných pomocných funkcií.
  */
 void bst_leftmost_postorder(bst_node_t *tree, stack_bst_t *to_visit, stack_bool_t *first_visit) {
+	while(tree){
+		stack_bst_push(to_visit, tree);
+		stack_bool_push(first_visit, true);
+		tree = tree->left;
+	}
 }
 
 /*
@@ -229,4 +332,24 @@ void bst_leftmost_postorder(bst_node_t *tree, stack_bst_t *to_visit, stack_bool_
  * zásobníkov uzlov a bool hodnôt bez použitia vlastných pomocných funkcií.
  */
 void bst_postorder(bst_node_t *tree) {
+	stack_bst_t to_visit;
+	stack_bool_t first_visit;
+	stack_bool_init(&first_visit);
+	stack_bst_init(&to_visit);
+	bool fromLeft;
+
+	bst_leftmost_postorder(tree, &to_visit, &first_visit);
+	while(!stack_bst_empty(&to_visit)){
+		tree = stack_bst_top(&to_visit);
+		fromLeft = stack_bool_top(&first_visit);
+		stack_bool_pop(&first_visit);
+		if(fromLeft){
+			stack_bool_push(&first_visit, false);
+			bst_leftmost_postorder(tree->right, &to_visit, &first_visit);
+		}
+		else{
+			stack_bst_pop(&to_visit);
+			bst_print_node(tree);
+		}
+	}
 }
