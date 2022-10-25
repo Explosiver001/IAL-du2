@@ -8,6 +8,7 @@
 #include "../btree.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../test_util.h"
 
 /*
  * Inicializácia stromu.
@@ -96,7 +97,19 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
+	target->key = (*tree)->key;
+	target->value = (*tree)->value;
 
+	if((*tree)->right){
+		bst_replace_by_rightmost((*tree), &(*tree)->right);
+	}
+	else if((*tree)->left){
+		bst_replace_by_rightmost((*tree), &(*tree)->left);
+	}
+	else{
+		free(*tree);
+		(*tree) = NULL;
+	}
 }
 
 /*
@@ -112,7 +125,6 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
  * použitia vlastných pomocných funkcií.
  */
 void bst_delete(bst_node_t **tree, char key) {
-
 	if(!*tree)
 		return;
 	else{
@@ -127,8 +139,11 @@ void bst_delete(bst_node_t **tree, char key) {
 					*tree = NULL;
 				}
 				else{
-					if((*tree)->left && (*tree)->right){
-
+					if((*tree)->right){
+						bst_replace_by_rightmost((*tree), &(*tree)->right);
+					}
+					else{
+						bst_replace_by_rightmost((*tree), &(*tree)->left);
 					}
 				}
 			}
@@ -146,8 +161,12 @@ void bst_delete(bst_node_t **tree, char key) {
  * Funkciu implementujte rekurzívne bez použitia vlastných pomocných funkcií.
  */
 void bst_dispose(bst_node_t **tree) {
-	
-
+	if(*tree){
+		bst_dispose(&(*tree)->left);
+		bst_dispose(&(*tree)->right);
+		free(*tree);
+		(*tree) = NULL;
+	}
 }
 
 /*
