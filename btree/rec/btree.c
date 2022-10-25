@@ -8,7 +8,6 @@
 #include "../btree.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "../test_util.h"
 
 /*
  * Inicializácia stromu.

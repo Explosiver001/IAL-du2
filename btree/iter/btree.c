@@ -66,23 +66,49 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  * Funkciu implementujte iteratívne bez použitia vlastných pomocných funkcií.
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
+	if(!(*tree)){
+		*tree = malloc(sizeof(bst_node_t));
+		(*tree)->left = NULL;
+		(*tree)->right = NULL;
+		(*tree)->key = key;
+		(*tree)->value = value;
+		return;
+	}
 	bool found = false;
-	bst_node_t *where;
-
-	if(*tree == NULL){
-		where = *tree;
-	}
-	else{
-		do{
-			where = *tree;
-			if(key < (*tree)->key){
-				
+	bst_node_t *root = *tree;
+	do{
+		if(key < root->key){
+			if(root->left)
+				root = root->left;
+			else{
+				root->left = malloc(sizeof(bst_node_t));
+				root = root->left;
+				root->left = NULL;
+				root->right = NULL;
+				root->key = key;
+				root->value = value;
+				found = true;
 			}
-
-
-		}while(!found && *tree != NULL);
-	}
-
+		}
+		else{
+			if(key > root->key)
+				if(root->right)
+					root = root->right;
+				else{
+					root->right = malloc(sizeof(bst_node_t));
+					root = root->right;
+					root->left = NULL;
+					root->right = NULL;
+					root->key = key;
+					root->value = value;
+					
+				}
+			else{
+				root->value = value;
+				found = true;
+			}
+		}
+	}while(!found && *tree != NULL);
 }
 
 /*
@@ -139,6 +165,12 @@ void bst_dispose(bst_node_t **tree) {
  * vlastných pomocných funkcií.
  */
 void bst_leftmost_preorder(bst_node_t *tree, stack_bst_t *to_visit) {
+	stack_bst_init(to_visit);
+	
+	
+	while(tree){
+
+	}
 }
 
 /*
@@ -185,8 +217,7 @@ void bst_inorder(bst_node_t *tree) {
  * Funkciu implementujte iteratívne pomocou zásobníkov uzlov a bool hodnôt a bez použitia
  * vlastných pomocných funkcií.
  */
-void bst_leftmost_postorder(bst_node_t *tree, stack_bst_t *to_visit,
-                            stack_bool_t *first_visit) {
+void bst_leftmost_postorder(bst_node_t *tree, stack_bst_t *to_visit, stack_bool_t *first_visit) {
 }
 
 /*
