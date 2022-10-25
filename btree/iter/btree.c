@@ -20,12 +20,7 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree) {
-	if(*tree){
-		return;
-	}
-	*tree = malloc(sizeof(bst_node_t));
-	(*tree)->left = NULL;
-	(*tree)->right = NULL;
+	*tree = NULL;
 }
 
 /*

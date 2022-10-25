@@ -18,12 +18,7 @@
  * možné toto detegovať vo funkcii.
  */
 void bst_init(bst_node_t **tree) {
-	if(*tree){
-		return;
-	}
-	*tree = malloc(sizeof(bst_node_t));
-	(*tree)->left = NULL;
-	(*tree)->right = NULL;
+	*tree = NULL;
 }
 
 /*
@@ -69,7 +64,9 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
  */
 void bst_insert(bst_node_t **tree, char key, int value) {
 	if(*tree == NULL){
-		bst_init(tree);
+		*tree=malloc(sizeof(bst_node_t));
+		(*tree)->left = NULL;
+		(*tree)->right = NULL;
 		(*tree)->key = key;
 		(*tree)->value = value;
 		return;
