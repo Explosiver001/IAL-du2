@@ -32,7 +32,8 @@ int get_hash(char *key) {
  * Inicializácia tabuľky — zavolá sa pred prvým použitím tabuľky.
  */
 void ht_init(ht_table_t *table) {
-
+	for(int i = 0; i < HT_SIZE; i++)
+		(*table)[i] = NULL;
 }
 
 /*
@@ -42,7 +43,15 @@ void ht_init(ht_table_t *table) {
  * hodnotu NULL.
  */
 ht_item_t *ht_search(ht_table_t *table, char *key) {
-  return NULL;
+	ht_item_t * item = (*table)[get_hash(key)];
+	
+	while(item){
+		if(strcmp(key, item->key))
+			return item;
+
+		item = item->next;
+	}
+	return NULL;
 }
 
 /*
@@ -54,6 +63,19 @@ ht_item_t *ht_search(ht_table_t *table, char *key) {
  * synonym zvoľte najefektívnejšiu možnosť a vložte prvok na začiatok zoznamu.
  */
 void ht_insert(ht_table_t *table, char *key, float value) {
+	ht_item_t * item = ht_search(table, key);
+	if(item){
+		item->value = value;
+	}
+	else{
+		int hash = get_hash(key);
+		(*table)[hash] = malloc(sizeof(ht_item_t));
+		item = (*table)[hash];
+		item->key = malloc(sizeof(*key));
+		strcpy(item->key, key);
+		item->value = value;
+		item->next = NULL;
+	}
 }
 
 /*
@@ -65,7 +87,15 @@ void ht_insert(ht_table_t *table, char *key, float value) {
  * Pri implementácii využite funkciu ht_search.
  */
 float *ht_get(ht_table_t *table, char *key) {
-  return NULL;
+	ht_item_t * item = (*table)[get_hash(key)];
+	
+	while(item){
+		if(strcmp(key, item->key))
+			return &item->value;
+
+		item = item->next;
+	}
+	return NULL;
 }
 
 /*
@@ -77,6 +107,22 @@ float *ht_get(ht_table_t *table, char *key) {
  * Pri implementácii NEVYUŽÍVAJTE funkciu ht_search.
  */
 void ht_delete(ht_table_t *table, char *key) {
+	int hash = get_hash(key);
+	ht_item_t *prev = NULL, * item = (*table)[hash];
+	
+	while(item){
+		if(strcmp(key, item->key)){
+			if(prev)
+				prev->next = item->next;
+			else
+				(*table)[hash] = item->next;
+
+			free(item->key);
+			free(item);
+		}
+		prev = item;
+		item = item->next;
+	}
 }
 
 /*
@@ -86,4 +132,13 @@ void ht_delete(ht_table_t *table, char *key) {
  * inicializácii.
  */
 void ht_delete_all(ht_table_t *table) {
+	ht_item_t * item = NULL;
+	for(int i = 0; i < HT_SIZE; i++){
+		while((*table)[i]){
+			item = (*table)[i];
+			(*table)[i] = (*table)[i]->next;
+			free(item->key);
+			free(item);
+		}
+	}
 }

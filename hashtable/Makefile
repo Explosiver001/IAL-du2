@@ -6,6 +6,7 @@ FILES=hashtable.c test.c test_util.c
 
 test: $(FILES)
 	$(CC) $(CFLAGS) -o $@ $(FILES)
+	./test
 
 clean:
 	rm -f test
