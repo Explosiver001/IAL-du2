@@ -210,23 +210,25 @@ void bst_delete(bst_node_t **tree, char key) {
 void bst_dispose(bst_node_t **tree) {
 	stack_bst_t to_free;
 	stack_bst_init(&to_free);
+	bst_node_t * ptr = *tree;
 
 	do{
-		if(!(*tree)){
+		if(!ptr){
 			if(!stack_bst_empty(&to_free)){
-				(*tree) = stack_bst_pop(&to_free);
+				ptr = stack_bst_pop(&to_free);
 			}
 		}
 		else{
-			if((*tree)->right){
-				stack_bst_push(&to_free, (*tree)->right);
+			if(ptr->right){
+				stack_bst_push(&to_free, ptr->right);
 			}
 
-			bst_node_t *node = (*tree);
-			(*tree) = (*tree)->left;
+			bst_node_t *node = ptr;
+			ptr = ptr->left;
 			free(node);
 		}
-	}while(*tree);
+	}while(ptr || !stack_bst_empty(&to_free));
+	*tree = NULL;
 }
 
 /*
