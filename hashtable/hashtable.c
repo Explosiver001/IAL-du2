@@ -46,7 +46,7 @@ ht_item_t *ht_search(ht_table_t *table, char *key) {
 	ht_item_t * item = (*table)[get_hash(key)];
 	
 	while(item){
-		if(strcmp(key, item->key))
+		if(!strcmp(key, item->key))
 			return item;
 
 		item = item->next;
@@ -69,12 +69,12 @@ void ht_insert(ht_table_t *table, char *key, float value) {
 	}
 	else{
 		int hash = get_hash(key);
-		(*table)[hash] = malloc(sizeof(ht_item_t));
-		item = (*table)[hash];
+		item = malloc(sizeof(ht_item_t));
+		item->next = (*table)[hash];
+		(*table)[hash] = item;
 		item->key = malloc(sizeof(*key));
 		strcpy(item->key, key);
 		item->value = value;
-		item->next = NULL;
 	}
 }
 
@@ -111,7 +111,7 @@ void ht_delete(ht_table_t *table, char *key) {
 	ht_item_t *prev = NULL, * item = (*table)[hash];
 	
 	while(item){
-		if(strcmp(key, item->key)){
+		if(!strcmp(key, item->key)){
 			if(prev)
 				prev->next = item->next;
 			else
