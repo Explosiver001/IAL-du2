@@ -72,7 +72,7 @@ void ht_insert(ht_table_t *table, char *key, float value) {
 		item = malloc(sizeof(ht_item_t));
 		item->next = (*table)[hash];
 		(*table)[hash] = item;
-		item->key = malloc(sizeof(*key));
+		item->key = malloc(sizeof(char)*(strlen(key)+1));
 		strcpy(item->key, key);
 		item->value = value;
 	}
