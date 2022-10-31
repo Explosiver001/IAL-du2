@@ -126,28 +126,28 @@ void bst_insert(bst_node_t **tree, char key, int value) {
  */
 void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
 	bst_node_t *node = *tree;
-	bool lastRight = true;
+	bool lastLeft = true;
 	while(true){
 		target->key = node->key;
 		target->value = node->value;
-		if(node->right){
-			target = node;
-			node = node->right;
-			lastRight = true;
-		}
-		else if(node->left){
+		if(node->left){
 			target = node;
 			node = node->left;
-			lastRight = false;
+			lastLeft = true;
+		}
+		else if(node->right){
+			target = node;
+			node = node->right;
+			lastLeft = false;
 		}
 		else{
-			if(lastRight){
-				free(target->right);
-				target->right = NULL;
-			}
-			else{
+			if(lastLeft){
 				free(target->left);
 				target->left = NULL;
+			}
+			else{
+				free(target->right);
+				target->right = NULL;
 			}
 			break;
 		}
@@ -185,10 +185,10 @@ void bst_delete(bst_node_t **tree, char key) {
 	
 	if(*node){
 		if((*node)->left || (*node)->right){
-			if((*node)->right)
-				bst_replace_by_rightmost(*node, &((*node)->right));
-			else
+			if((*node)->left)
 				bst_replace_by_rightmost(*node, &((*node)->left));
+			else
+				bst_replace_by_rightmost(*node, &((*node)->right));
 		}
 		else{
 			free(*node);
